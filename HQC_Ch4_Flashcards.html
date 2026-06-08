@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — HQC Chapitre 4</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --politique: #1a3a6b;
+    --politique-light: #deeaf1;
+    --politique-accent: #2e75b6;
+    --autochtone: #2d5a1b;
+    --autochtone-light: #e8f5e3;
+    --autochtone-accent: #4a8c2a;
+    --economie: #7a4200;
+    --economie-light: #fff4e0;
+    --economie-accent: #c97a00;
+    --autres: #5a1e6b;
+    --autres-light: #f5e8ff;
+    --autres-accent: #9b3db8;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --border: #30363d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 10%, rgba(26,58,107,0.25) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 90%, rgba(45,90,27,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 60% 40%, rgba(90,30,107,0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 40px 32px 28px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+    background: rgba(13,17,23,0.8);
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo-area h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  .logo-area h1 span { color: #58a6ff; }
+
+  .logo-area p {
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .stat-pill {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-pill strong { color: var(--text); }
+
+  /* ── THEME TABS ── */
+  .theme-nav {
+    position: relative;
+    z-index: 10;
+    padding: 20px 32px 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .theme-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .theme-tab {
+    padding: 10px 20px;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid transparent;
+    border-bottom: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.04);
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .theme-tab:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+  .theme-tab.active {
+    background: var(--theme-color, #1a3a6b);
+    color: #fff;
+    border-color: var(--theme-color, #1a3a6b);
+  }
+
+  .theme-tab[data-theme="politique"]  { --theme-color: var(--politique-accent); }
+  .theme-tab[data-theme="autochtone"] { --theme-color: var(--autochtone-accent); }
+  .theme-tab[data-theme="economie"]   { --theme-color: var(--economie-accent); }
+  .theme-tab[data-theme="autres"]     { --theme-color: var(--autres-accent); }
+
+  /* ── MAIN AREA ── */
+  main {
+    position: relative;
+    z-index: 5;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px 60px;
+  }
+
+  .theme-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .theme-panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── CONTROLS ── */
+  .controls {
+    padding: 20px 0 24px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  .controls-left {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+  }
+
+  .btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
+  .btn.primary { background: var(--theme-accent, #2e75b6); border-color: transparent; color: #fff; }
+  .btn.primary:hover { opacity: 0.9; }
+
+  .progress-info {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .progress-info strong { color: var(--text); font-size: 15px; }
+
+  /* ── SINGLE FLASHCARD VIEW ── */
+  .card-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 0 24px;
+  }
+
+  .flashcard-wrap {
+    width: 100%;
+    max-width: 700px;
+    perspective: 1200px;
+  }
+
+  .flashcard {
+    width: 100%;
+    min-height: 280px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .flashcard.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    min-height: 280px;
+    border-radius: 20px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 48px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .card-front {
+    background: var(--surface);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .card-back {
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0.6;
+    padding: 4px 12px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .card-text {
+    font-size: 22px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .card-front .card-text { color: #e6edf3; }
+
+  .card-back .card-text {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .card-hint {
+    margin-top: 16px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.5px;
+  }
+
+  .card-num {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.4;
+  }
+
+  /* Card nav buttons */
+  .card-nav {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+  .card-counter {
+    font-size: 15px;
+    color: var(--muted);
+    min-width: 80px;
+    text-align: center;
+  }
+
+  .card-counter strong { color: var(--text); font-size: 18px; }
+
+  /* Mastery buttons */
+  .mastery-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .mastery-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mastery-btn span { font-size: 20px; }
+  .mastery-btn.again:hover  { background: rgba(210,56,56,0.2); border-color: #d23838; }
+  .mastery-btn.hard:hover   { background: rgba(201,122,0,0.2); border-color: #c97a00; }
+  .mastery-btn.good:hover   { background: rgba(46,117,182,0.2); border-color: #2e75b6; }
+  .mastery-btn.easy:hover   { background: rgba(45,90,27,0.2); border-color: #4a8c2a; }
+
+  .mastery-btn.again  { --c: #d23838; }
+  .mastery-btn.hard   { --c: #c97a00; }
+  .mastery-btn.good   { --c: #2e75b6; }
+  .mastery-btn.easy   { --c: #4a8c2a; }
+
+  /* Mastery progress bar */
+  .mastery-bar-wrap {
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .mastery-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .mastery-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+  }
+
+  .mastery-seg { height: 100%; transition: width 0.4s ease; }
+  .mastery-seg.again  { background: #d23838; }
+  .mastery-seg.hard   { background: #c97a00; }
+  .mastery-seg.good   { background: #2e75b6; }
+  .mastery-seg.easy   { background: #4a8c2a; }
+
+  /* ── GRID VIEW ── */
+  .grid-view {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .grid-view.active { display: grid; }
+
+  .grid-card {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grid-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--theme-stripe);
+  }
+
+  .grid-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .grid-card .num {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .grid-card .q-text {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .grid-card .r-text {
+    font-size: 13px;
+    color: #58a6ff;
+    line-height: 1.5;
+    display: none;
+    font-weight: 600;
+  }
+
+  .grid-card.revealed .r-text { display: block; }
+
+  .grid-card .reveal-hint {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .grid-card.revealed .reveal-hint { display: none; }
+
+  .mastery-dot {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .mastery-dot.again { background: #d23838; }
+  .mastery-dot.hard  { background: #c97a00; }
+  .mastery-dot.good  { background: #2e75b6; }
+  .mastery-dot.easy  { background: #4a8c2a; }
+
+  /* ── VIEW TOGGLE ── */
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .view-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+
+  .view-btn.active { background: rgba(255,255,255,0.12); color: var(--text); }
+
+  /* ── SCORE OVERVIEW ── */
+  .overview-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .overview-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .overview-stat {
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .overview-stat .num { font-size: 28px; font-weight: 700; font-family: 'Playfair Display', serif; }
+  .overview-stat .lbl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .overview-stat.again .num { color: #d23838; }
+  .overview-stat.hard .num  { color: #c97a00; }
+  .overview-stat.good .num  { color: #2e75b6; }
+  .overview-stat.easy .num  { color: #4a8c2a; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    header, main, .theme-nav { padding-left: 16px; padding-right: 16px; }
+    .card-face { padding: 28px 24px; }
+    .card-text { font-size: 18px; }
+    .mastery-row { flex-wrap: wrap; }
+    .mastery-btn { min-width: calc(50% - 6px); }
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <h1>Flashcards <span>HQC</span></h1>
+      <p>Chapitre 4 — Le Québec contemporain</p>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-pill">📚 <strong>64</strong> cartes</div>
+      <div class="stat-pill">🎯 <strong id="global-mastered">0</strong> maîtrisées</div>
+      <div class="stat-pill" id="global-pct">0%</div>
+    </div>
+  </div>
+</header>
+
+<div class="theme-nav">
+  <div class="theme-tabs">
+    <button class="theme-tab active" data-theme="politique" onclick="switchTheme('politique')">🏛️ Politique & Constitution (21)</button>
+    <button class="theme-tab" data-theme="autochtone" onclick="switchTheme('autochtone')">🦅 Autochtones (15)</button>
+    <button class="theme-tab" data-theme="economie" onclick="switchTheme('economie')">💼 Économie (13)</button>
+    <button class="theme-tab" data-theme="autres" onclick="switchTheme('autres')">🌿 Autres thèmes (15)</button>
+  </div>
+</div>
+
+<main>
+
+<!-- ═══════════════════ POLITIQUE ═══════════════════ -->
+<div class="theme-panel active" id="panel-politique">
+  <div class="controls">
+    <div class="controls-left">
+      <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('politique','single')">☰ Étude</button>
+        <button class="view-btn" onclick="setView('politique','grid')">⊞ Grille</button>
+      </div>
+      <button class="btn" onclick="shuffleCards('politique')">🔀 Mélanger</button>
+      <button class="btn" onclick="resetMastery('politique')">↺ Réinitialiser</button>
+    </div>
+    <div class="progress-info">Maîtrisées : <strong id="pol-mastered">0</strong> / 21</div>
+  </div>
+
+  <div class="overview-section">
+    <div class="overview-title">Progression — Intégration politique</div>
+    <div class="overview-grid">
+      <div class="overview-stat again"><div class="num" id="pol-again">0</div><div class="lbl">À revoir</div></div>
+      <div class="overview-stat hard"><div class="num" id="pol-hard">0</div><div class="lbl">Difficile</div></div>
+      <div class="overview-stat good"><div class="num" id="pol-good">0</div><div class="lbl">Bien</div></div>
+      <div class="overview-stat easy"><div class="num" id="pol-easy">0</div><div class="lbl">Maîtrisé</div></div>
+    </div>
+    <div class="mastery-bar-wrap" style="margin-top:16px">
+      <div class="mastery-bar" id="pol-bar">
+        <div class="mastery-seg again" id="pol-bar-again" style="width:0%"></div>
+        <div class="mastery-seg hard"  id="pol-bar-hard"  style="width:0%"></div>
+        <div class="mastery-seg good"  id="pol-bar-good"  style="width:0%"></div>
+        <div class="mastery-seg easy"  id="pol-bar-easy"  style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Single card view -->
+  <div class="card-stage" id="pol-single">
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="pol-card" onclick="flipCard('politique')">
+        <div class="card-face card-front" style="background: linear-gradient(135deg, #0d1117 0%, #1a3a6b22 100%);">
+          <div class="card-num" id="pol-num"></div>
+          <div class="card-label">❓ Question</div>
+          <div class="card-text" id="pol-q"></div>
+          <div class="card-hint">Cliquez pour révéler la réponse</div>
+        </div>
+        <div class="card-face card-back" style="background: linear-gradient(135deg, #1a3a6b 0%, #2e75b6 100%);">
+          <div class="card-label" style="color:#fff">✅ Réponse</div>
+          <div class="card-text" id="pol-r" style="color:#fff"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" id="pol-prev" onclick="prevCard('politique')" disabled>←</button>
+      <div class="card-counter"><strong id="pol-ci">1</strong> / <span id="pol-ct">21</span></div>
+      <button class="nav-btn" id="pol-next" onclick="nextCard('politique')">→</button>
+    </div>
+    <div class="mastery-row" id="pol-mastery-row" style="display:none">
+      <button class="mastery-btn again" onclick="rateMastery('politique','again')"><span>😰</span>À revoir</button>
+      <button class="mastery-btn hard"  onclick="rateMastery('politique','hard')"><span>😕</span>Difficile</button>
+      <button class="mastery-btn good"  onclick="rateMastery('politique','good')"><span>😊</span>Bien</button>
+      <button class="mastery-btn easy"  onclick="rateMastery('politique','easy')"><span>⭐</span>Maîtrisé</button>
+    </div>
+  </div>
+
+  <!-- Grid view -->
+  <div class="grid-view" id="pol-grid"></div>
+</div>
+
+<!-- ═══════════════════ AUTOCHTONES ═══════════════════ -->
+<div class="theme-panel" id="panel-autochtone">
+  <div class="controls">
+    <div class="controls-left">
+      <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('autochtone','single')">☰ Étude</button>
+        <button class="view-btn" onclick="setView('autochtone','grid')">⊞ Grille</button>
+      </div>
+      <button class="btn" onclick="shuffleCards('autochtone')">🔀 Mélanger</button>
+      <button class="btn" onclick="resetMastery('autochtone')">↺ Réinitialiser</button>
+    </div>
+    <div class="progress-info">Maîtrisées : <strong id="aut-mastered">0</strong> / 15</div>
+  </div>
+
+  <div class="overview-section">
+    <div class="overview-title">Progression — Peuples autochtones</div>
+    <div class="overview-grid">
+      <div class="overview-stat again"><div class="num" id="aut-again">0</div><div class="lbl">À revoir</div></div>
+      <div class="overview-stat hard"><div class="num" id="aut-hard">0</div><div class="lbl">Difficile</div></div>
+      <div class="overview-stat good"><div class="num" id="aut-good">0</div><div class="lbl">Bien</div></div>
+      <div class="overview-stat easy"><div class="num" id="aut-easy">0</div><div class="lbl">Maîtrisé</div></div>
+    </div>
+    <div class="mastery-bar-wrap" style="margin-top:16px">
+      <div class="mastery-bar" id="aut-bar">
+        <div class="mastery-seg again" id="aut-bar-again" style="width:0%"></div>
+        <div class="mastery-seg hard"  id="aut-bar-hard"  style="width:0%"></div>
+        <div class="mastery-seg good"  id="aut-bar-good"  style="width:0%"></div>
+        <div class="mastery-seg easy"  id="aut-bar-easy"  style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-stage" id="aut-single">
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="aut-card" onclick="flipCard('autochtone')">
+        <div class="card-face card-front" style="background: linear-gradient(135deg, #0d1117 0%, #2d5a1b22 100%);">
+          <div class="card-num" id="aut-num"></div>
+          <div class="card-label">❓ Question</div>
+          <div class="card-text" id="aut-q"></div>
+          <div class="card-hint">Cliquez pour révéler la réponse</div>
+        </div>
+        <div class="card-face card-back" style="background: linear-gradient(135deg, #2d5a1b 0%, #4a8c2a 100%);">
+          <div class="card-label" style="color:#fff">✅ Réponse</div>
+          <div class="card-text" id="aut-r" style="color:#fff"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" id="aut-prev" onclick="prevCard('autochtone')" disabled>←</button>
+      <div class="card-counter"><strong id="aut-ci">1</strong> / <span id="aut-ct">15</span></div>
+      <button class="nav-btn" id="aut-next" onclick="nextCard('autochtone')">→</button>
+    </div>
+    <div class="mastery-row" id="aut-mastery-row" style="display:none">
+      <button class="mastery-btn again" onclick="rateMastery('autochtone','again')"><span>😰</span>À revoir</button>
+      <button class="mastery-btn hard"  onclick="rateMastery('autochtone','hard')"><span>😕</span>Difficile</button>
+      <button class="mastery-btn good"  onclick="rateMastery('autochtone','good')"><span>😊</span>Bien</button>
+      <button class="mastery-btn easy"  onclick="rateMastery('autochtone','easy')"><span>⭐</span>Maîtrisé</button>
+    </div>
+  </div>
+  <div class="grid-view" id="aut-grid"></div>
+</div>
+
+<!-- ═══════════════════ ECONOMIE ═══════════════════ -->
+<div class="theme-panel" id="panel-economie">
+  <div class="controls">
+    <div class="controls-left">
+      <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('economie','single')">☰ Étude</button>
+        <button class="view-btn" onclick="setView('economie','grid')">⊞ Grille</button>
+      </div>
+      <button class="btn" onclick="shuffleCards('economie')">🔀 Mélanger</button>
+      <button class="btn" onclick="resetMastery('economie')">↺ Réinitialiser</button>
+    </div>
+    <div class="progress-info">Maîtrisées : <strong id="eco-mastered">0</strong> / 13</div>
+  </div>
+
+  <div class="overview-section">
+    <div class="overview-title">Progression — Économie & mondialisation</div>
+    <div class="overview-grid">
+      <div class="overview-stat again"><div class="num" id="eco-again">0</div><div class="lbl">À revoir</div></div>
+      <div class="overview-stat hard"><div class="num" id="eco-hard">0</div><div class="lbl">Difficile</div></div>
+      <div class="overview-stat good"><div class="num" id="eco-good">0</div><div class="lbl">Bien</div></div>
+      <div class="overview-stat easy"><div class="num" id="eco-easy">0</div><div class="lbl">Maîtrisé</div></div>
+    </div>
+    <div class="mastery-bar-wrap" style="margin-top:16px">
+      <div class="mastery-bar">
+        <div class="mastery-seg again" id="eco-bar-again" style="width:0%"></div>
+        <div class="mastery-seg hard"  id="eco-bar-hard"  style="width:0%"></div>
+        <div class="mastery-seg good"  id="eco-bar-good"  style="width:0%"></div>
+        <div class="mastery-seg easy"  id="eco-bar-easy"  style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-stage" id="eco-single">
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="eco-card" onclick="flipCard('economie')">
+        <div class="card-face card-front" style="background: linear-gradient(135deg, #0d1117 0%, #7a420022 100%);">
+          <div class="card-num" id="eco-num"></div>
+          <div class="card-label">❓ Question</div>
+          <div class="card-text" id="eco-q"></div>
+          <div class="card-hint">Cliquez pour révéler la réponse</div>
+        </div>
+        <div class="card-face card-back" style="background: linear-gradient(135deg, #7a4200 0%, #c97a00 100%);">
+          <div class="card-label" style="color:#fff">✅ Réponse</div>
+          <div class="card-text" id="eco-r" style="color:#fff"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" id="eco-prev" onclick="prevCard('economie')" disabled>←</button>
+      <div class="card-counter"><strong id="eco-ci">1</strong> / <span id="eco-ct">13</span></div>
+      <button class="nav-btn" id="eco-next" onclick="nextCard('economie')">→</button>
+    </div>
+    <div class="mastery-row" id="eco-mastery-row" style="display:none">
+      <button class="mastery-btn again" onclick="rateMastery('economie','again')"><span>😰</span>À revoir</button>
+      <button class="mastery-btn hard"  onclick="rateMastery('economie','hard')"><span>😕</span>Difficile</button>
+      <button class="mastery-btn good"  onclick="rateMastery('economie','good')"><span>😊</span>Bien</button>
+      <button class="mastery-btn easy"  onclick="rateMastery('economie','easy')"><span>⭐</span>Maîtrisé</button>
+    </div>
+  </div>
+  <div class="grid-view" id="eco-grid"></div>
+</div>
+
+<!-- ═══════════════════ AUTRES ═══════════════════ -->
+<div class="theme-panel" id="panel-autres">
+  <div class="controls">
+    <div class="controls-left">
+      <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('autres','single')">☰ Étude</button>
+        <button class="view-btn" onclick="setView('autres','grid')">⊞ Grille</button>
+      </div>
+      <button class="btn" onclick="shuffleCards('autres')">🔀 Mélanger</button>
+      <button class="btn" onclick="resetMastery('autres')">↺ Réinitialiser</button>
+    </div>
+    <div class="progress-info">Maîtrisées : <strong id="aut2-mastered">0</strong> / 15</div>
+  </div>
+
+  <div class="overview-section">
+    <div class="overview-title">Progression — Autres thèmes</div>
+    <div class="overview-grid">
+      <div class="overview-stat again"><div class="num" id="aut2-again">0</div><div class="lbl">À revoir</div></div>
+      <div class="overview-stat hard"><div class="num" id="aut2-hard">0</div><div class="lbl">Difficile</div></div>
+      <div class="overview-stat good"><div class="num" id="aut2-good">0</div><div class="lbl">Bien</div></div>
+      <div class="overview-stat easy"><div class="num" id="aut2-easy">0</div><div class="lbl">Maîtrisé</div></div>
+    </div>
+    <div class="mastery-bar-wrap" style="margin-top:16px">
+      <div class="mastery-bar">
+        <div class="mastery-seg again" id="aut2-bar-again" style="width:0%"></div>
+        <div class="mastery-seg hard"  id="aut2-bar-hard"  style="width:0%"></div>
+        <div class="mastery-seg good"  id="aut2-bar-good"  style="width:0%"></div>
+        <div class="mastery-seg easy"  id="aut2-bar-easy"  style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-stage" id="aut2-single">
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="aut2-card" onclick="flipCard('autres')">
+        <div class="card-face card-front" style="background: linear-gradient(135deg, #0d1117 0%, #5a1e6b22 100%);">
+          <div class="card-num" id="aut2-num"></div>
+          <div class="card-label">❓ Question</div>
+          <div class="card-text" id="aut2-q"></div>
+          <div class="card-hint">Cliquez pour révéler la réponse</div>
+        </div>
+        <div class="card-face card-back" style="background: linear-gradient(135deg, #5a1e6b 0%, #9b3db8 100%);">
+          <div class="card-label" style="color:#fff">✅ Réponse</div>
+          <div class="card-text" id="aut2-r" style="color:#fff"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" id="aut2-prev" onclick="prevCard('autres')" disabled>←</button>
+      <div class="card-counter"><strong id="aut2-ci">1</strong> / <span id="aut2-ct">15</span></div>
+      <button class="nav-btn" id="aut2-next" onclick="nextCard('autres')">→</button>
+    </div>
+    <div class="mastery-row" id="aut2-mastery-row" style="display:none">
+      <button class="mastery-btn again" onclick="rateMastery('autres','again')"><span>😰</span>À revoir</button>
+      <button class="mastery-btn hard"  onclick="rateMastery('autres','hard')"><span>😕</span>Difficile</button>
+      <button class="mastery-btn good"  onclick="rateMastery('autres','good')"><span>😊</span>Bien</button>
+      <button class="mastery-btn easy"  onclick="rateMastery('autres','easy')"><span>⭐</span>Maîtrisé</button>
+    </div>
+  </div>
+  <div class="grid-view" id="aut2-grid"></div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+const DATA = {
+  politique: {
+    id: 'pol', total: 21, stripe: '#2e75b6',
+    cards: [
+      {q:"Quelle est la date du premier référendum sur la souveraineté-association ?", r:"Le 20 mai 1980"},
+      {q:"Quel était le résultat du référendum de 1980 ?", r:"59,56 % NON — 40,44 % OUI : rejet de la souveraineté-association"},
+      {q:"Quel concept René Lévesque défendait-il lors du référendum de 1980 ?", r:"La souveraineté-association : indépendance politique + lien économique avec le Canada"},
+      {q:"Quelle promesse Pierre Elliott Trudeau fit-il aux Québécois avant le référendum de 1980 ?", r:"Modifier la Constitution pour accorder un statut particulier au Québec (fédéralisme renouvelé)"},
+      {q:"Qu'est-ce que la « Nuit des longs couteaux » (4 novembre 1981) ?", r:"Réunion secrète de Trudeau avec 9 premiers ministres provinciaux pour rapatrier la Constitution sans le Québec"},
+      {q:"En quelle année la Loi constitutionnelle est-elle officiellement signée ?", r:"Le 17 avril 1982, entre Trudeau et la reine Élisabeth II, sans représentant québécois"},
+      {q:"Que comprend la Loi constitutionnelle de 1982 ?", r:"La Charte canadienne des droits et libertés + reconnaissance des droits ancestraux autochtones (art. 35)"},
+      {q:"Quel était l'objectif principal de l'Accord du lac Meech (1987) ?", r:"Faire adhérer le Québec à la Constitution en lui accordant le statut de « société distincte »"},
+      {q:"Pourquoi l'Accord du lac Meech a-t-il échoué en 1990 ?", r:"Le Manitoba et Terre-Neuve n'ont pas ratifié l'accord dans les délais prescrits"},
+      {q:"Quel rôle Elijah Harper a-t-il joué dans l'échec du lac Meech ?", r:"Député autochtone manitobain, il a bloqué l'adoption en refusant son consentement à l'Assemblée"},
+      {q:"Quelle commission Robert Bourassa a-t-il créée après l'échec du lac Meech ?", r:"La Commission Bélanger-Campeau sur l'avenir politique et constitutionnel du Québec"},
+      {q:"Qu'a proposé le rapport Allaire (1991) ?", r:"L'autonomie politique du Québec et la tenue d'un nouveau référendum"},
+      {q:"Quel a été le résultat du référendum sur l'Accord de Charlottetown (1992) ?", r:"Rejeté : 56,7 % des Québécois et 54,6 % des Canadiens ont voté NON"},
+      {q:"Qui était Premier ministre du Québec lors du deuxième référendum (1995) ?", r:"Jacques Parizeau"},
+      {q:"Quel a été le résultat du référendum de 1995 ?", r:"50,58 % NON contre 49,42 % OUI — victoire très serrée du camp du NON"},
+      {q:"Quelle loi le gouvernement fédéral a-t-il adoptée après 1995 pour encadrer tout futur référendum ?", r:"La Loi sur la clarté référendaire (gouvernement Chrétien)"},
+      {q:"Quelle motion Stephen Harper a-t-il proposée en faveur du Québec ?", r:"Une motion reconnaissant la nation québécoise au sein du Canada"},
+      {q:"Qui a fondé le Bloc québécois et en quelle année ?", r:"Lucien Bouchard, en 1990, après l'échec du lac Meech"},
+      {q:"Qu'est-ce que le « love-in » de Montréal (1995) ?", r:"Grand rassemblement de partisans du NON à Montréal pour montrer l'attachement au Canada"},
+      {q:"Quelle est la principale différence entre les référendums de 1980 et de 1995 ?", r:"En 1980, le NON l'emporte à 59 % ; en 1995, il gagne de justesse à 50,58 %, révélant une société très divisée"},
+      {q:"Qu'est-ce que la Loi sur la clarté référendaire (2000) exige pour qu'un référendum sur la sécession soit reconnu par Ottawa ?", r:"Une question claire approuvée par le Parlement fédéral ET une majorité \"claire\" jugée suffisante par le Parlement après le vote — le simple 50 % + 1 est expressément rejeté"}
+    ]
+  },
+  autochtone: {
+    id: 'aut', total: 15, stripe: '#4a8c2a',
+    cards: [
+      {q:"Quel article de la Loi constitutionnelle de 1982 reconnaît les droits ancestraux autochtones ?", r:"L'article 35"},
+      {q:"Qu'est-ce que le projet de loi C-31 (1985) a accordé aux femmes autochtones ?", r:"Le statut d'Indien aux enfants des femmes autochtones mariées à des non-autochtones"},
+      {q:"Quelle est l'origine de la Crise d'Oka (1990) ?", r:"Un projet d'agrandissement de golf et un projet immobilier sur des terres revendiquées par les Mohawks de Kanesatake"},
+      {q:"En quelle date la Crise d'Oka a-t-elle débuté ?", r:"Le 11 juillet 1990"},
+      {q:"Quel policier a été mortellement blessé durant la Crise d'Oka ?", r:"Le caporal Marcel Lemay de la Sûreté du Québec"},
+      {q:"Quelle réserve mohawk a bloqué le pont Mercier lors de la Crise d'Oka ?", r:"La réserve de Kahnawake (rive-sud de Montréal)"},
+      {q:"Quand les barricades de la Crise d'Oka ont-elles été défaites ?", r:"Le 29 août 1990"},
+      {q:"Qu'est-ce que la Paix des Braves (2002) ?", r:"Entente Québec–Cris : 70 M$/an pendant 50 ans en échange de l'accès à certaines terres ancestrales"},
+      {q:"Qu'est-ce que le Nunavut et quand a-t-il été créé ?", r:"Territoire inuit autonome créé en 1999, découpé des Territoires du Nord-Ouest"},
+      {q:"Qu'est-ce que la Commission de vérité et réconciliation du Canada ?", r:"Commission fédérale documentant les séquelles des pensionnats autochtones et formulant des recommandations"},
+      {q:"Qu'est-ce que le mouvement « Idle No More » ?", r:"Mouvement autochtone réclamant la souveraineté des Premières Nations et la protection des terres et des eaux"},
+      {q:"Que réclamaient les groupes autochtones après le rapatriement constitutionnel de 1982 ?", r:"Davantage d'autonomie politique et la reconnaissance de leurs droits territoriaux"},
+      {q:"Qu'illustre la photo d'une maison dans la réserve de Pikangikum ?", r:"Les conditions de vie précaires des autochtones, nettement inférieures à celles des non-autochtones"},
+      {q:"Qui était Premier ministre du Québec lors de la signature de la Paix des Braves ?", r:"Bernard Landry (chef du Parti québécois)"},
+      {q:"Quel lien existe-t-il entre la Loi constitutionnelle de 1982 et la Crise d'Oka ?", r:"L'art. 35 reconnaît les droits ancestraux autochtones, leur donnant une base légale pour revendiquer leurs terres"}
+    ]
+  },
+  economie: {
+    id: 'eco', total: 13, stripe: '#c97a00',
+    cards: [
+      {q:"Que signifie l'ALÉNA et quand a-t-il été signé ?", r:"Accord de libre-échange nord-américain, signé en 1994 entre le Canada, les États-Unis et le Mexique"},
+      {q:"Quel est un avantage et un inconvénient de l'ALÉNA pour le Québec ?", r:"Avantage : accès aux marchés US et mexicain / Inconvénient : délocalisations d'usines vers le Mexique"},
+      {q:"Qu'est-ce que le néolibéralisme dans le contexte du Québec contemporain ?", r:"Idéologie prônant le libre marché, la réduction de l'État et la privatisation des sociétés d'État"},
+      {q:"Quelle était la situation économique au début des années 1980 au Québec ?", r:"Récession sévère : chômage ~14 %, taux hypothécaires jusqu'à 20 %, ralentissement de la construction"},
+      {q:"Qu'est-ce que la privatisation dans le contexte québécois des années 1980-1990 ?", r:"L'État cède des entreprises publiques au secteur privé pour réduire les dépenses gouvernementales"},
+      {q:"Qu'est-ce que l'altermondialisme ?", r:"Mouvement s'opposant aux effets négatifs de la mondialisation et réclamant une meilleure répartition des richesses"},
+      {q:"Qu'est-ce que le « Québec inc. » ?", r:"Expression désignant l'émergence d'une classe entrepreneuriale francophone québécoise face à la mondialisation"},
+      {q:"Pourquoi le gouvernement a-t-il développé l'aérospatiale et le numérique ?", r:"Pour demeurer compétitif face à la mondialisation et compenser les pertes d'emplois liées aux délocalisations"},
+      {q:"Quelle loi a visé à réduire les inégalités salariales hommes-femmes au Québec ?", r:"La Loi sur l'équité salariale, adoptée en 1996"},
+      {q:"Quelles mesures l'État québécois a-t-il prises pour favoriser la conciliation travail-famille ?", r:"Création des CPE (1997), Régime québécois d'assurance parentale — RQAP (2006), congés parentaux"},
+      {q:"Où observe-t-on principalement le phénomène de dévitalisation des régions au Québec ?", r:"Dans les régions ressources éloignées et les villes mono-industrielles (ex. : Murdochville, Schefferville, Gaspésie, Côte-Nord) qui dépendent d'une seule industrie comme les mines, la forêt ou la pêche"},
+      {q:"Qu'est-ce que la dévitalisation des régions et quelle est son origine principale ?", r:"Déclin démographique et économique d'une région causé par la fermeture d'entreprises mono-industrielles suite aux fluctuations du marché mondial des ressources naturelles"},
+      {q:"Quelle est la principale conséquence politique de la dévitalisation des régions ?", r:"L'exode rural : les travailleurs quittent leur région pour les villes, réduisant la population locale et donc le nombre de circonscriptions — ce qui diminue le poids politique des régions à l'Assemblée nationale"}
+    ]
+  },
+  autres: {
+    id: 'aut2', total: 15, stripe: '#9b3db8',
+    cards: [
+      {q:"Qu'est-ce que la dénatalité et pourquoi est-ce un problème pour le Québec ?", r:"Baisse du taux de naissances → vieillissement de la population, manque de main-d'œuvre et pression sur les finances publiques"},
+      {q:"Quel accord a permis au Québec de sélectionner ses immigrants selon ses propres critères ?", r:"L'Accord Canada-Québec relatif à l'immigration (1991)"},
+      {q:"Quelle politique d'immigration le Québec a-t-il adoptée en 2016 ?", r:"La politique « Ensemble, nous sommes le Québec »"},
+      {q:"Qu'est-ce que la dévitalisation des régions ?", r:"Déclin démographique et économique des régions mono-industrielles dû aux fermetures d'entreprises"},
+      {q:"Qu'est-ce que la Loi sur l'équité salariale (1996) oblige les entreprises à faire ?", r:"Verser un salaire égal pour des emplois équivalents occupés majoritairement par des femmes"},
+      {q:"Qu'est-ce que le RQAP et quand a-t-il été instauré ?", r:"Régime québécois d'assurance parentale (2006) : prestations gouvernementales pour congés parentaux"},
+      {q:"Quelle loi a encadré le partage du patrimoine familial lors d'un divorce (1989) ?", r:"La Loi sur le patrimoine familial : partage à parts égales des biens accumulés durant le mariage"},
+      {q:"En quelle année le Québec a-t-il légalisé le mariage civil entre conjoints de même sexe ?", r:"En 2002"},
+      {q:"Quel est le principal secteur émetteur de GES au Québec ?", r:"Le secteur des transports (~44,8 % des émissions en 2018)"},
+      {q:"Quelle loi de 1986 oblige les compagnies forestières à reboiser ?", r:"La Loi sur les forêts (1986)"},
+      {q:"Qu'est-ce que le Plan Nord (2011) ?", r:"Projet du gouvernement Charest visant l'exploitation des ressources minérales au nord du 49e parallèle"},
+      {q:"Qu'est-ce que la Loi sur la laïcité de l'État (loi 21, 2019) interdit ?", r:"Le port de signes religieux aux employés de l'État en position d'autorité durant leurs fonctions"},
+      {q:"Qu'est-ce que la Charte de la langue française (loi 101, 1977) exigeait en matière d'affichage ?", r:"L'affichage public et la publicité commerciale uniquement en français"},
+      {q:"Comment la loi 86 (1993) a-t-elle modifié la loi 101 sur l'affichage ?", r:"Elle permet l'affichage bilingue à condition que le français soit nettement prédominant"},
+      {q:"Qu'est-ce que le mouvement étudiant du carré rouge réclamait ?", r:"Une augmentation des bourses, une réduction des droits de scolarité, voire la gratuité scolaire"}
+    ]
+  }
+};
+
+// ═══════════════════════ STATE ═══════════════════════
+const STATE = {};
+Object.keys(DATA).forEach(theme => {
+  const d = DATA[theme];
+  STATE[theme] = {
+    order: [...Array(d.total).keys()],
+    current: 0,
+    flipped: false,
+    mastery: Array(d.total).fill(null),
+    view: 'single'
+  };
+});
+
+// ═══════════════════════ RENDER ═══════════════════════
+function renderCard(theme) {
+  const d = DATA[theme];
+  const s = STATE[theme];
+  const idx = s.order[s.current];
+  const card = d.cards[idx];
+  const pfx = d.id;
+
+  // reset flip
+  s.flipped = false;
+  document.getElementById(`${pfx}-card`).classList.remove('flipped');
+  document.getElementById(`${pfx}-mastery-row`).style.display = 'none';
+
+  document.getElementById(`${pfx}-q`).textContent = card.q;
+  document.getElementById(`${pfx}-r`).textContent = card.r;
+  document.getElementById(`${pfx}-num`).textContent = `${s.current + 1} / ${d.total}`;
+  document.getElementById(`${pfx}-ci`).textContent = s.current + 1;
+  document.getElementById(`${pfx}-prev`).disabled = s.current === 0;
+  document.getElementById(`${pfx}-next`).disabled = s.current === d.total - 1;
+}
+
+function flipCard(theme) {
+  const d = DATA[theme];
+  const s = STATE[theme];
+  s.flipped = !s.flipped;
+  document.getElementById(`${d.id}-card`).classList.toggle('flipped', s.flipped);
+  document.getElementById(`${d.id}-mastery-row`).style.display = s.flipped ? 'flex' : 'none';
+}
+
+function nextCard(theme) {
+  const s = STATE[theme];
+  if (s.current < DATA[theme].total - 1) { s.current++; renderCard(theme); }
+}
+
+function prevCard(theme) {
+  const s = STATE[theme];
+  if (s.current > 0) { s.current--; renderCard(theme); }
+}
+
+function rateMastery(theme, rating) {
+  const d = DATA[theme];
+  const s = STATE[theme];
+  const idx = s.order[s.current];
+  s.mastery[idx] = rating;
+  updateStats(theme);
+  renderGrid(theme);
+  if (s.current < d.total - 1) {
+    s.current++;
+    renderCard(theme);
+  }
+}
+
+function shuffleCards(theme) {
+  const s = STATE[theme];
+  s.order = [...Array(DATA[theme].total).keys()].sort(() => Math.random() - 0.5);
+  s.current = 0;
+  renderCard(theme);
+}
+
+function resetMastery(theme) {
+  const s = STATE[theme];
+  s.mastery = Array(DATA[theme].total).fill(null);
+  s.current = 0;
+  s.order = [...Array(DATA[theme].total).keys()];
+  renderCard(theme);
+  updateStats(theme);
+  renderGrid(theme);
+}
+
+function updateStats(theme) {
+  const d = DATA[theme];
+  const s = STATE[theme];
+  const pfx = d.id;
+  const counts = {again:0, hard:0, good:0, easy:0};
+  s.mastery.forEach(m => { if(m) counts[m]++; });
+  const total = d.total;
+
+  ['again','hard','good','easy'].forEach(r => {
+    const el = document.getElementById(`${pfx}-${r}`);
+    if (el) el.textContent = counts[r];
+    const bar = document.getElementById(`${pfx}-bar-${r}`);
+    if (bar) bar.style.width = (counts[r]/total*100) + '%';
+  });
+
+  const mastered = counts.good + counts.easy;
+  const mastEl = document.getElementById(`${pfx}-mastered`);
+  if (mastEl) mastEl.textContent = mastered;
+
+  // Global update
+  let totalMastered = 0, totalCards = 0;
+  Object.keys(DATA).forEach(t => {
+    totalCards += DATA[t].total;
+    totalMastered += STATE[t].mastery.filter(m => m === 'good' || m === 'easy').length;
+  });
+  document.getElementById('global-mastered').textContent = totalMastered;
+  document.getElementById('global-pct').textContent = Math.round(totalMastered/totalCards*100) + '%';
+}
+
+// ═══════════════════════ GRID ═══════════════════════
+function renderGrid(theme) {
+  const d = DATA[theme];
+  const s = STATE[theme];
+  const pfx = d.id;
+  const container = document.getElementById(`${pfx}-grid`);
+  container.innerHTML = '';
+  d.cards.forEach((card, i) => {
+    const div = document.createElement('div');
+    div.className = 'grid-card';
+    div.style.setProperty('--theme-stripe', d.stripe);
+    const m = s.mastery[i];
+    div.innerHTML = `
+      <div class="mastery-dot ${m || ''}"></div>
+      <div class="num">Carte ${i+1}</div>
+      <div class="q-text">${card.q}</div>
+      <div class="r-text">${card.r}</div>
+      <div class="reveal-hint">Cliquer pour révéler</div>
+    `;
+    div.onclick = () => div.classList.toggle('revealed');
+    container.appendChild(div);
+  });
+}
+
+// ═══════════════════════ VIEWS ═══════════════════════
+function setView(theme, view) {
+  const d = DATA[theme];
+  const pfx = d.id;
+  STATE[theme].view = view;
+  document.getElementById(`${pfx}-single`).style.display = view === 'single' ? 'flex' : 'none';
+  const grid = document.getElementById(`${pfx}-grid`);
+  grid.classList.toggle('active', view === 'grid');
+  const panel = document.getElementById(`panel-${theme}`);
+  panel.querySelectorAll('.view-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&view==='single')||(i===1&&view==='grid')));
+  if (view === 'grid') renderGrid(theme);
+}
+
+function switchTheme(theme) {
+  document.querySelectorAll('.theme-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.theme-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`panel-${theme}`).classList.add('active');
+  document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
+}
+
+// ═══════════════════════ INIT ═══════════════════════
+Object.keys(DATA).forEach(theme => {
+  renderCard(theme);
+  updateStats(theme);
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const active = document.querySelector('.theme-panel.active');
+  if (!active) return;
+  const theme = active.id.replace('panel-','');
+  if (STATE[theme].view !== 'single') return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextCard(theme); }
+  if (e.key === 'ArrowLeft') prevCard(theme);
+  if (e.key === 'Enter') flipCard(theme);
+});
+</script>
+</body>
+</html>
